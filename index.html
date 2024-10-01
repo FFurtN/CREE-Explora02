@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREE Explora V2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #00913f; /* Fondo verde #00913f */
+            overflow: hidden;
+        }
+
+        /* Pantalla de bienvenida */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #00913f; /* Fondo verde de la pantalla de bienvenida */
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            animation: fadeIn 1s forwards;
+        }
+
+        .welcome-screen h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .welcome-screen p {
+            font-size: 1.2rem;
+            color: white;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .welcome-screen button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background-color: white;
+            color: #00913f;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Barra de secciones */
+        .navbar {
+            background-color: #fff;
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            transform: translateX(-250px);
+            transition: transform 0.5s ease; /* Animación de barrido */
+        }
+
+        .navbar.visible {
+            transform: translateX(0); /* Mostrar la barra */
+        }
+
+        .navbar h1 {
+            margin: 20px;
+            font-size: 1.5rem;
+            color: #000;
+        }
+
+        .navbar h1 span {
+            color: #00913f; /* Color #00913f para "CREE" */
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .navbar ul li {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #000;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Botón para ocultar/mostrar la barra */
+        #toggle-navbar {
+            position: fixed;
+            top: 60px; /* Ajustado para evitar ocultar el contenido */
+            left: 20px;
+            font-size: 2rem;
+            background-color: #000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 11;
+            padding: 5px 10px;
+            transition: left 0.5s ease;
+        }
+
+        .navbar.visible + #toggle-navbar {
+            left: 270px; /* Mueve el botón hacia la derecha cuando la barra está visible */
+        }
+
+        /* Contenedor de contenido principal */
+        .sections {
+            margin-left: 0; /* Inicia con la barra oculta */
+            padding: 100px 20px; /* Ajustado para que el contenido esté más abajo */
+            background-color: #00913f; /* Fondo verde de la información */
+            color: white;
+            height: 100vh;
+            overflow-y: auto;
+            width: 100%; /* Ajustar al ancho completo */
+            transition: margin-left 0.5s ease, opacity 0.3s ease; /* Animación de margen y opacidad */
+        }
+
+        .sections.with-navbar {
+            margin-left: 250px; /* Espacio para la barra cuando está visible */
+        }
+
+        .section-content {
+            opacity: 0; /* Inicialmente oculto */
+            display: none; /* Ocultar secciones no activas */
+            transition: opacity 0.3s ease; /* Efecto de transición más rápido */
+        }
+
+        .section-content.active {
+            opacity: 1; /* Solo la sección activa será visible */
+            display: block; /* Mostrar la sección activa */
+        }
+
+        /* Botones de los turnos */
+        .turno-button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+
+        /* Colores para los turnos */
+        .manana { background-color: #FFD700; } /* Amarillo */
+        .tarde { background-color: #FF4500; } /* Naranja */
+        .noche { background-color: #0000FF; } /* Azul */
+
+        /* Colores para los bachilleres */
+        .salud { background-color: #00BFFF; } /* Celeste */
+        .diseño { background-color: #FFD700; } /* Amarillo */
+        .informatica { background-color: #0000FF; } /* Azul */
+        .comercio { background-color: #800080; } /* Morado */
+        .basicas { background-color: #008000; } /* Verde */
+        .sociales { background-color: #FF0000; } /* Rojo */
+
+        /* Efectos de fade */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="welcome-screen" id="welcome-screen">
+    <h1>Bienvenido a CREE Explora V2</h1>
+    <p>Te invitamos a explorar la historia del CREE a lo largo del tiempo.</p>
+    <button onclick="start()">Iniciar</button>
+</div>
+
+<div class="navbar" id="navbar">
+    <h1><span>CREE</span> Explora</h1>
+    <ul>
+        <li><a onclick="changeSection('info')">Información Básica</a></li>
+        <li><a onclick="changeSection('historia')">Historia</a></li>
+        <li><a onclick="changeSection('horarios')">Horarios Académicos</a></li>
+        <li><a onclick="changeSection('festividades')">Festividades Académicas</a></li>
+    </ul>
+</div>
+
+<!-- Botón para ocultar/mostrar la barra -->
+<button id="toggle-navbar" onclick="toggleNavbar()">=</button>
+
+<div class="sections" id="sections">
+    <div id="info" class="section-content active">
+        <h2>Información Básica</h2>
+        <p>Esta es la información básica sobre la institución: </p>
+        <p>
+            El Centro Regional de Educación de Encarnación (CREE) es una de las instituciones educativas más grandes e 
+            influyentes del sur de Paraguay. Actualmente, la institución cuenta con más de 6,000 estudiantes, que se distribuyen en los niveles inicial, básico y medio. 
+            Estos estudiantes asisten en los turnos de mañana, tarde y noche, lo que permite una flexibilidad considerable para la comunidad estudiantil. Además, el CREE se 
+            destaca por su amplio abanico de opciones educativas, que van desde la educación tradicional hasta programas específicos de formación docente​.</p>
+        <p>Una de las características más valoradas del CREE es su infraestructura, que está diseñada para brindar
+             un ambiente educativo adecuado, funcional y moderno. Esto incluye no solo las aulas, sino también áreas especializadas 
+             para prácticas pedagógicas, lo que favorece tanto a los alumnos como a los docentes. Esta institución es vista como un centro de referencia en la región 
+             debido a su capacidad para adaptarse a las necesidades educativas locales y su compromiso con la calidad en la enseñanza.</p>
+        <p>Además, el CREE está organizado de manera que pueda ofrecer una atención integral a los estudiantes, con un cuerpo docente altamente capacitado que busca 
+            impulsar tanto el desarrollo académico como el personal de cada uno de los alumnos. Este enfoque integral ha permitido que la institución mantenga una 
+            sólida reputación en Encarnación y sea considerada un pilar en la formación de jóvenes profesionales.</p>
+        <p>Por otra parte, la institución promueve un fuerte sentido de comunidad, involucrando no solo a estudiantes y profesores, 
+            sino también a padres y tutores, quienes participan activamente en el proceso educativo. Este vínculo estrecho con la comunidad refuerza 
+            el impacto del CREE no solo como centro educativo, sino también como motor de desarrollo social en la región​.</p>
+        <p> Además de la educación formal, el CREE organiza y participa en actividades extracurriculares y eventos que fomentan 
+            la participación activa de los estudiantes en la sociedad, lo que contribuye a su formación como ciudadanos comprometidos 
+            y responsables. Esto refuerza su papel como una institución integral que busca el bienestar y el desarrollo de sus alumnos.</p>
+    </div>
+
+    <div id="historia" class="section-content">
+        <h2>Historia</h2>
+        <p>La historia del CREE se remonta a su fundación en el año 2000, cuando un grupo de educadores visionarios decidió crear un espacio de aprendizaje 
+            que pudiera atender a las necesidades educativas de la comunidad de Encarnación. Desde entonces, ha experimentado un crecimiento constante, 
+            incorporando nuevas modalidades educativas y ampliando su oferta académica.</p>
+        <p>A lo largo de los años, el CREE ha logrado posicionarse como una de las instituciones educativas más reconocidas de la región, 
+            gracias a su compromiso con la calidad y la innovación. Ha implementado programas educativos que se adaptan a las demandas del 
+            entorno, preparando a sus estudiantes para enfrentar los desafíos del mundo actual.</p>
+        <p>El CREE ha vivido hitos importantes, como la inauguración de nuevas instalaciones y la creación de alianzas estratégicas con otras 
+            instituciones educativas y organizaciones comunitarias. Estas iniciativas han permitido enriquecer la experiencia educativa de 
+            los alumnos y fortalecer el vínculo con la comunidad.</p>
+        <p>Hoy en día, el CREE continúa en constante evolución, buscando nuevas formas de mejorar la educación y ofrecer a sus estudiantes 
+            las herramientas necesarias para su desarrollo personal y profesional. La historia del CREE es un reflejo del esfuerzo colectivo 
+            de todos aquellos que han formado parte de su camino, desde sus fundadores hasta los estudiantes que hoy en día se forman 
+            en sus aulas.</p>
+    </div>
+
+    <div id="horarios" class="section-content">
+        <h2>Horarios Académicos</h2>
+        <div id="turno-buttons">
+            <button class="turno-button manana" onclick="showBachilleres('manana')">Turno Mañana</button>
+            <button class="turno-button tarde" onclick="showBachilleres('tarde')">Turno Tarde</button>
+            <button class="turno-button noche" onclick="showBachilleres('noche')">Turno Noche</button>
+        </div>
+        <div id="bachiller-buttons" style="display: none;">
+            <button class="turno-button salud" onclick="showHorario('salud')">Técnico en Salud</button>
+            <button class="turno-button diseño" onclick="showHorario('diseño')">Técnico en Diseño Gráfico</button>
+            <button class="turno-button informatica" onclick="showHorario('informatica')">Técnico en Informática</button>
+            <button class="turno-button comercio" onclick="showHorario('comercio')">Comercio</button>
+            <button class="turno-button basicas" onclick="showHorario('basicas')">Ciencias Básicas</button>
+            <button class="turno-button sociales" onclick="showHorario('sociales')">Ciencias Sociales</button>
+        </div>
+        <div id="horario-table" style="display: none;">
+            <h3>Horario de <span id="selected-bachiller"></span></h3>
+            <table border="1" style="width: 100%; text-align: center;">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miércoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                    </tr>
+                </thead>
+                <tbody id="horario-rows">
+                    <!-- Filas de horarios se insertarán aquí -->
+                </tbody>
+            </table>
+            <button onclick="backToBachilleres()">Retroceder a Bachilleres</button>
+            <button onclick="backToTurnos()">Volver a Turnos</button>
+        </div>
+    </div>
+
+    <div id="festividades" class="section-content">
+        <h2>Festividades Académicas</h2>
+        <p>El CREE celebra diversas festividades a lo largo del año que fomentan la unión y participación de la comunidad educativa. 
+            Algunas de las festividades más destacadas son:</p>
+        <ul>
+            <li>Día del Estudiante</li>
+            <li>Fiesta de Fin de Año</li>
+            <li>Semana de la Educación</li>
+            <li>Jornadas de Puertas Abiertas</li>
+        </ul>
+        <p>Estas actividades no solo permiten a los estudiantes disfrutar de momentos de esparcimiento, sino que también promueven valores 
+            como el trabajo en equipo, la solidaridad y el respeto entre los miembros de la comunidad.</p>
+    </div>
+</div>
+
+<script>
+    function start() {
+        document.getElementById("welcome-screen").style.animation = "fadeOut 1s forwards";
+        setTimeout(function() {
+            document.getElementById("welcome-screen").style.display = "none";
+            document.getElementById("navbar").classList.add('visible');
+            document.getElementById("sections").classList.add('with-navbar');
+            changeSection('info'); // Cambia a la sección de Información Básica
+        }, 1000);
+    }
+
+    function toggleNavbar() {
+        const navbar = document.getElementById("navbar");
+        navbar.classList.toggle('visible');
+        const sections = document.getElementById("sections");
+        sections.classList.toggle('with-navbar');
+    }
+
+    function changeSection(section) {
+        const sections = document.querySelectorAll('.section-content');
+        sections.forEach(sec => {
+            sec.classList.remove('active');
+            sec.style.animation = "fadeOut 0.3s forwards"; // Desvanecer la sección
+        });
+        setTimeout(() => {
+            document.getElementById(section).classList.add('active');
+            document.getElementById(section).style.animation = "fadeIn 0.3s forwards"; // Mostrar nueva sección
+        }, 300);
+    }
+
+    function showBachilleres(turno) {
+        document.getElementById("turno-buttons").style.display = "none";
+        document.getElementById("bachiller-buttons").style.display = "block";
+    }
+
+    function showHorario(bachiller) {
+        const bachillerNames = {
+            salud: "Técnico en Salud",
+            diseño: "Técnico en Diseño Gráfico",
+            informatica: "Técnico en Informática",
+            comercio: "Comercio",
+            basicas: "Ciencias Básicas",
+            sociales: "Ciencias Sociales"
+        };
+        document.getElementById("selected-bachiller").innerText = bachillerNames[bachiller];
+
+        // Generar horarios de ejemplo (puedes modificar con tus datos)
+        const horariosEjemplo = {
+            salud: {
+                "8:00 AM": ["Matemáticas", "", "", "", "Historia"],
+                "9:00 AM": ["Química", "Física", "", "", "Biología"],
+                "10:00 AM": ["Educación Física", "Inglés", "", "", ""],
+            },
+            diseño: {
+                "8:00 AM": ["Dibujo Técnico", "Geografía", "", "", ""],
+                "9:00 AM": ["Matemáticas", "Ciencias", "", "", "Arte"],
+                "10:00 AM": ["Informática", "", "", "Historia", ""],
+            },
+            informatica: {
+                "8:00 AM": ["Programación", "", "", "Matemáticas", ""],
+                "9:00 AM": ["Sistemas", "", "Física", "", ""],
+                "10:00 AM": ["Educación Física", "Inglés", "", "", ""],
+            },
+            comercio: {
+                "8:00 AM": ["Contabilidad", "", "Matemáticas", "", ""],
+                "9:00 AM": ["Derecho", "", "", "Historia", "Biología"],
+                "10:00 AM": ["Informática", "", "", "", ""],
+            },
+            basicas: {
+                "8:00 AM": ["Ciencias", "", "", "Matemáticas", ""],
+                "9:00 AM": ["Historia", "Inglés", "", "", ""],
+                "10:00 AM": ["Educación Física", "", "", "", ""],
+            },
+            sociales: {
+                "8:00 AM": ["Sociología", "", "", "Historia", "Matemáticas"],
+                "9:00 AM": ["Ciencias", "", "", "", ""],
+                "10:00 AM": ["Filosofía", "", "", "", "Inglés"],
+            },
+        };
+
+        // Limpiar la tabla de horarios
+        const horarioRows = document.getElementById("horario-rows");
+        horarioRows.innerHTML = '';
+
+        // Rellenar la tabla con los horarios
+        Object.keys(horariosEjemplo[bachiller]).forEach(hora => {
+            const row = document.createElement('tr');
+            const horaCell = document.createElement('td');
+            horaCell.innerText = hora;
+            row.appendChild(horaCell);
+            horariosEjemplo[bachiller][hora].forEach(asignatura => {
+                const asignaturaCell = document.createElement('td');
+                asignaturaCell.innerText = asignatura || '';
+                row.appendChild(asignaturaCell);
+            });
+            horarioRows.appendChild(row);
+        });
+
+        document.getElementById("bachiller-buttons").style.display = "none";
+        document.getElementById("horario-table").style.display = "block";
+    }
+
+    function backToBachilleres() {
+        document.getElementById("horario-table").style.display = "none";
+        document.getElementById("bachiller-buttons").style.display = "block";
+    }
+
+    function backToTurnos() {
+        document.getElementById("horario-table").style.display = "none";
+        document.getElementById("turno-buttons").style.display = "block";
+    }
+</script>
+</body>
+</html>
